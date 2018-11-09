@@ -1,9 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 // initialize our express app
 const app = express();
 
+
+
+
 const user = require('./routes/user.route'); 
+const item = require('./routes/item.route'); 
 
 // Set up mongoose connection
 const mongoose = require('mongoose');
@@ -18,10 +23,17 @@ db.on('error', console.error.bind(console, "Can't connect to database !"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use('/users', user);
+app.use('/items', item);
 
 
 let port = 3005;
 
+
+//Middleware
+app.use((req, res, next) => {
+    fs.appendFileSync('./logReq.log', `[${new Date().toJSON().slice(0,10)} ${new Date().toJSON().slice(11,19)}] [${req.method}] ${req.originalUrl}\r\n`)
+    next()
+    });
 
 
 app.listen(port, () => {
